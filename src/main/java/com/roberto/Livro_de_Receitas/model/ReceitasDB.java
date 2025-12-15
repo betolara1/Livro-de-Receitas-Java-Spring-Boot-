@@ -12,11 +12,13 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "receitas")
 public class ReceitasDB {
@@ -24,6 +26,7 @@ public class ReceitasDB {
     @Getter
     @Setter
     @AllArgsConstructor
+    @NoArgsConstructor
     @Embeddable // <-- ESSA ANOTAÇÃO PARA JPA USADO PARA CRIAR UM ARRAY DE OBJETOS
     public static class Ingredient{
         private String item;
@@ -37,14 +40,8 @@ public class ReceitasDB {
     private String title;
     private String description;
     private String prepTime;
-    private String cookTime;
-    private String servings;
-    private String[] difficulty = {"facil","medio","dificil"};
-    private String category;
+    private String difficulty;
     private String temperature;
-    private String imageUrl;
-    private int rating;
-    private int favorites;
 
     @ElementCollection // <-- ESSA ANOTAÇÃO PARA USAR ARRAYs
     private List<Ingredient> ingredients;//: array de objetos { item: string; quantity: string }
@@ -52,10 +49,18 @@ public class ReceitasDB {
     @ElementCollection
     private List<String> instructions;
 
+    //private String cookTime;
+    //private String servings;
+    //private String category;
+    //private String imageUrl;
+    //private int rating;
+    //private int favorites;
+
+    /*
     @ElementCollection
     private List<String> tags;
     
     @ElementCollection
     private List<String> images;
-
+    */
 }

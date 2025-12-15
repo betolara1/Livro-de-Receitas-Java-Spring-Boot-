@@ -17,7 +17,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "favoritos")
-public class Usuarios {
+public class UsuariosDB {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
