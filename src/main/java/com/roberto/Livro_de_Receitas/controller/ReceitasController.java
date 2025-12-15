@@ -9,13 +9,17 @@ import com.roberto.Livro_de_Receitas.service.ReceitasService;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
+//GET É PARA RETORNAR AS INFORMAÇÕES (CONSULTA)
+//POST É PARA INSERIR AS INFORMAÇÕES (SALVAR)
+//PUT É PARA ALTERAR AS INFORMAÇÕES (ALTERAR)
+//DELETE É PARA DELETAR AS INFORMAÇÕES (DELETAR)
 
 @RestController
 @RequestMapping("/api/receitas")
@@ -35,19 +39,22 @@ public class ReceitasController {
 
     //CLASSE PARA RETORNAR A RECEITA PELO ID
     @GetMapping("/{id}")
-    public ResponseEntity<ReceitasDB> buscarReceita(@PathVariable Long id) {
+    public ResponseEntity<ReceitasDB> buscarReceitaId(@PathVariable Long id) {
         return receitasService.buscarPorId(id)              //BUSCA A RECEITA PELO ID
                 .map(ResponseEntity::ok)                    //CONFIRMA SE ACHOU A RECEITA COM OK
                 .orElse(ResponseEntity.notFound().build()); //SENÃO DIZ QUE NÃO ENCONTROU
     }
     
-    //
+    //CLASSE PARA CRIAR AS RECEITAS
     @PostMapping
-    public String postMethodName(@RequestBody String entity) {
-        //TODO: process POST request
-        
-        return entity;
+    public ReceitasDB criarReceita(@RequestBody ReceitasDB receita) {
+        return receitasService.salvarReceita(receita);
     }
     
-    
+    //CLASSE PARA DELETAR RECEITAS POR ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarReceita(@PathVariable Long id){
+        receitasService.deletarReceita(id);
+        return ResponseEntity.noContent().build(); //USADO PORQUE O DELETARRECEITA CRIADO COMO VOID 
+    }
 }
