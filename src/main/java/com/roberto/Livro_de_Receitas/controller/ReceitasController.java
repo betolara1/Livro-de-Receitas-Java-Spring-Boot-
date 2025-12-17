@@ -3,6 +3,7 @@ package com.roberto.Livro_de_Receitas.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.roberto.Livro_de_Receitas.DTO.ReceitasDTO;
 import com.roberto.Livro_de_Receitas.model.ReceitasDB;
 import com.roberto.Livro_de_Receitas.service.ReceitasService;
 
@@ -31,19 +32,22 @@ public class ReceitasController {
         this.receitasService = receitasService;
     } 
 
-    //CLASSE PARA LISTAR AS RECEITAS 
+
+    //CLASSE PARA LISTAR AS RECEITAS (RETORNA SOMENTE OS CAMPOS DA CLASSE receitaDTO)
     @GetMapping
-    public List<ReceitasDB> listarReceitas() {
+    public List<ReceitasDTO> listarReceitas() {
         return receitasService.listarReceitas();
     }
 
-    //CLASSE PARA RETORNAR A RECEITA PELO ID
-    //SEMPRE COLOCAR O ? DENTRO DO <> QUANDO COLOCAR TRATAMENTO DE EXCEÇÃO - ResponseEntity<?>
+
+    // CLASSE QUE BUSCA OS DADOS POR ID
+    // MÉTODO PARA BUSCAR DO DTO PARA MOSTRAR APENAS O NECESSÁRIO ("O QUE EU REALMENTE QUERO MOSTRAR AO USUARIO FINAL")
+    // LOGICA FEITA NO SERVICE DO QUE RETORNAR AO USUARIO
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarReceitaId(@PathVariable Long id) { 
-        //TRY E CATCH NÃO É MAIS NECESSARIO PORQUE CRIAMOS O ARQUIVO DE EXCEÇÕES GLOBAIS
-        ReceitasDB receitasDB = receitasService.buscarPorId(id);
-        return ResponseEntity.ok(receitasDB);
+    public ResponseEntity<ReceitasDTO> pegarReceita(@PathVariable Long id) {
+        // O controller pede pro service um DTO, não um DB
+        ReceitasDTO receitaPronta = receitasService.buscarPorId(id);
+        return ResponseEntity.ok(receitaPronta);
     }
     
     //CLASSE PARA CRIAR AS RECEITAS
@@ -56,6 +60,18 @@ public class ReceitasController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarReceita(@PathVariable Long id){
         receitasService.deletarReceita(id);
-        return ResponseEntity.noContent().build(); //USADO PORQUE O DELETARRECEITA CRIADO COMO VOID 
+        return ResponseEntity.noContent().build(); //USADO PORQUE O DELETARRECEITA FOI CRIADO COMO VOID 
     }
 }
+
+
+    /*
+    // ESSE METODO É PARA BUSCAR DIRETO DO RECEITASDB
+    //CLASSE PARA RETORNAR A RECEITA PELO ID
+    //SEMPRE COLOCAR O ? DENTRO DO <> QUANDO COLOCAR TRATAMENTO DE EXCEÇÃO - ResponseEntity<?>
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarReceitaId(@PathVariable Long id) { 
+        //TRY E CATCH NÃO É MAIS NECESSARIO PORQUE CRIAMOS O ARQUIVO DE EXCEÇÕES GLOBAIS
+        ReceitasDB receitasDB = receitasService.buscarPorId(id);
+        return ResponseEntity.ok(receitasDB);
+    }*/

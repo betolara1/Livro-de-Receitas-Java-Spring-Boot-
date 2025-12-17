@@ -1,42 +1,45 @@
 package com.roberto.Livro_de_Receitas.exception;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
-@ControllerAdvice //ANOTAÇÃO QUE FICA ESCUTANDO PARA RETORNAR OS EXCEPTIONS
+import com.roberto.Livro_de_Receitas.DTO.StandardErrorDTO;
+
+import jakarta.servlet.http.HttpServletRequest; // Importante para pegar o caminho da URL
+
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
-    //CLASSE PARA TRATAR AS EXCEÇÕES GLOBAIS
+    // TRATAMENTO DE RECURSO NÃO ENCONTRADO (404)
     @ExceptionHandler(RecursoNaoEncontradoException.class)
-    public ResponseEntity<Object> handleRecursoNaoEncontrado(RecursoNaoEncontradoException ex){
-        Map<String, Object> body = new LinkedHashMap<>();
+    public ResponseEntity<StandardErrorDTO> handleRecursoNaoEncontrado(RecursoNaoEncontradoException ex, HttpServletRequest request) {
+        
+        StandardErrorDTO erro = new StandardErrorDTO(
+            LocalDateTime.now(),
+            HttpStatus.NOT_FOUND.value(),
+            "Não Encontrado",
+            ex.getMessage(),
+            request.getRequestURI() // Mostra qual URL o usuário tentou acessar
+        );
 
-        //OS BODY É O QUE VAI RETORNAR NO JSON QUANDO NÃO ENCONTRAR
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        body.put("error", "ID não encontrado");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
     }
 
-    //CLASSE GENÉRICA PARA TRATAR EXCEÇÕES INTERNAS DO SERVIDOR
-    @ExceptionHandler(Exception.class) //CRIA UMA ANOTAÇÃO PARA A CLASSE EXCEPTION
-    public ResponseEntity<Object> handleGenericException(Exception ex){
-        Map<String, Object> body = new LinkedHashMap<>();
+    // TRATAMENTO GENÉRICO (500)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<StandardErrorDTO> handleGenericException(Exception ex, HttpServletRequest request) {
+        
+        StandardErrorDTO erro = new StandardErrorDTO(
+            LocalDateTime.now(),
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            "Erro Interno do Servidor",
+            ex.getMessage(),
+            request.getRequestURI()
+        );
 
-        //OS BODY É O QUE VAI RETORNAR NO JSON QUANDO NÃO ENCONTRAR
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        body.put("error", "Recurso não encontrado");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(erro);
     }
 }
