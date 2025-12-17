@@ -36,8 +36,11 @@ public class ReceitasService {
     // MÉTODO PARA BUSCAR DO DTO PARA MOSTRAR APENAS O NECESSÁRIO ("O QUE EU REALMENTE QUERO MOSTRAR AO USUARIO FINAL")
     public ReceitasDTO buscarPorId(Long id) {
         // BUSCA O ID NO BANCO DE DADOS
-        ReceitasDB receita = receitasRepository.findById(id).get(); 
+        ReceitasDB receita = receitasRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException
+                ("Receita não encontrada! ID: " + id)); // EXCEÇÃO ESPECIFICA CASO NÃO ENCONTRA O ID
 
+                
         // O SERVICE JÁ SABE O QUE PRECISA RETORNAR POR CAUSA DO CONSTRUTOR FEITO NO DTO
         return new ReceitasDTO(receita); 
     }
