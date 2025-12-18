@@ -8,13 +8,11 @@ import lombok.Data;
 public class UsuariosDTO {
     private Long id;
     private String username;
-    private String email;
 
     public UsuariosDTO (){}
 
     public UsuariosDTO (UsuariosDB usuarios){
         this.id = usuarios.getId();
         this.username = usuarios.getUsername();
-        this.email = usuarios.getEmail();
     }
 }

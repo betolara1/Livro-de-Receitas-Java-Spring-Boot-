@@ -26,7 +26,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
-        UsuariosDB usuario = usuariosService.registrarUsuarios(request.get("username"), "password");
+        UsuariosDB usuario = usuariosService.registrarUsuarios(request.get("username"), request.get("password"));
         return ResponseEntity.ok(usuario);
     }
 
