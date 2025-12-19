@@ -61,14 +61,25 @@ public class ReceitasService {
         return new ReceitasDTO(receitaDB);
     }
 
+    
     //CLASSE PARA DELETAR UMA RECEITA
-    public void deletarReceita(Long id){
+    public void deletarReceita(Long id) {
+        // 1. DESCOBRE QUEM ESTÁ TENTANDO DELETAR (QUEM É DONO DO TOKEN)
+        UsuariosDB usuarioLogado = getUsuarioLogado();
 
-        if(!receitasRepository.existsById(id)){
-            throw new RecursoNaoEncontradoException("Receita com o ID "+id+" não encontrado!");
+        // 2. BUSCA A RECEITA NO BANCO. SE NÃO ACHAR, SOLTA ERRO 404.
+        ReceitasDB receita = receitasRepository.findById(id)
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Receita não encontrada com id: " + id));
+
+        // 3. VERIFICAÇÃO DE SEGURANÇA
+        // COMPARA O ID DO DONO DA RECEITA COM O ID DO USUÁRIO LOGADO
+        if (!receita.getUsuario().getId().equals(usuarioLogado.getId())) {
+            // SE FOREM DIFERENTES, BLOQUEIA!
+            throw new RuntimeException("Operação não permitida: Você só pode deletar suas próprias receitas!");
         }
 
-        receitasRepository.deleteById(id);
+        // 4. SE PASSOU PELA VERIFICAÇÃO, PODE DELETAR
+        receitasRepository.delete(receita);
     }
 
 
