@@ -3,52 +3,62 @@ package com.roberto.Livro_de_Receitas.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.roberto.Livro_de_Receitas.DTO.ReceitasDTO;
 import com.roberto.Livro_de_Receitas.exception.RecursoNaoEncontradoException;
 import com.roberto.Livro_de_Receitas.model.ReceitasDB;
+import com.roberto.Livro_de_Receitas.model.UsuariosDB;
 import com.roberto.Livro_de_Receitas.repository.ReceitasRepository;
+import com.roberto.Livro_de_Receitas.repository.UsuariosRepository;
 
 @Service
 public class ReceitasService {
 
-    // INSTANCIAR A CLASSE DE RECEITASREPOSITORY
-    private final ReceitasRepository receitasRepository;
-    public ReceitasService (ReceitasRepository receitasRepository){
-        this.receitasRepository = receitasRepository;
+    @Autowired
+    private ReceitasRepository receitasRepository;
+    @Autowired
+    private UsuariosRepository usuariosRepository;
+
+
+    private UsuariosDB getUsuarioLogado() {
+        // PEGA O EMAIL/USERNAME QUE ESTAVA NO TOKEN JWT
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        
+        // BUSCA NO BANCO OS DADOS COMPLETOS DESSE USUÁRIO
+        return usuariosRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
 
-    // CLASSE PARA LISTAR TODOS OS DADOS DA TABELA RECEITAS
-    // 
-    public List<ReceitasDTO> listarReceitas(){
-        List<ReceitasDB> receitasDoBanco = receitasRepository.findAll();
-
-        // 2. Converte usando o SEU construtor e Java Streams
-        return receitasDoBanco.stream()
-                .map(ReceitasDTO::new) // <--- Aqui ele chama seu construtor automaticamente para cada item
-                .collect(Collectors.toList());
+    // 2. CRIAR RECEITA (AUTOMATICAMENTE VINCULADA)
+    public ReceitasDB salvarReceita(ReceitasDB novaReceita) {
+        UsuariosDB usuario = getUsuarioLogado(); // DESCOBRE QUEM TÁ MANDANDO A REQUISIÇÃO
+        novaReceita.setUsuario(usuario); // CARIMBA A RECEITA COM O USUARIO
+        return receitasRepository.save(novaReceita);
     }
 
 
-    // CLASSE QUE BUSCA OS DADOS POR ID
-    // MÉTODO PARA BUSCAR DO DTO PARA MOSTRAR APENAS O NECESSÁRIO ("O QUE EU REALMENTE QUERO MOSTRAR AO USUARIO FINAL")
+    // 3. LISTAR (APENAS AS MINHAS)
+    public List<ReceitasDTO> listarReceitas() {
+        UsuariosDB usuario = getUsuarioLogado();
+        List<ReceitasDB> receitasDB = receitasRepository.findByUsuario(usuario);
+
+        return receitasDB.stream()
+        .map(ReceitasDTO::new)
+        .collect(Collectors.toList()); // TRAZ SÓ AS DO USUARIO
+    }
+
     public ReceitasDTO buscarPorId(Long id) {
-        // BUSCA O ID NO BANCO DE DADOS
-        ReceitasDB receita = receitasRepository.findById(id)
+        UsuariosDB usuariosDB = getUsuarioLogado();
+
+        ReceitasDB receitaDB = receitasRepository.findByIdAndUsuario(id, usuariosDB)
                 .orElseThrow(() -> new RecursoNaoEncontradoException
                 ("Receita não encontrada! ID: " + id)); // EXCEÇÃO ESPECIFICA CASO NÃO ENCONTRA O ID
-
-
-        // O SERVICE JÁ SABE O QUE PRECISA RETORNAR POR CAUSA DO CONSTRUTOR FEITO NO DTO
-        return new ReceitasDTO(receita); 
-    }
-
     
-    //CLASSE PARA SALVAR AS RECEITAS
-    public ReceitasDB salvarReceita(ReceitasDB receita){
-        return receitasRepository.save(receita);
+        return new ReceitasDTO(receitaDB);
     }
 
     //CLASSE PARA DELETAR UMA RECEITA
@@ -60,5 +70,6 @@ public class ReceitasService {
 
         receitasRepository.deleteById(id);
     }
+
 
 }

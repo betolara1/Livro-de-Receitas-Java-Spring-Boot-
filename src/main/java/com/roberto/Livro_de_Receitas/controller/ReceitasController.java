@@ -9,6 +9,8 @@ import com.roberto.Livro_de_Receitas.service.ReceitasService;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,17 +28,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/api/receitas")
 public class ReceitasController {
 
-    //CRIAR O CONSTRUTOR PRA INSTANCIAR A CLASSE DO RECEITAS SERVICE
-    private final ReceitasService receitasService;
-    public ReceitasController(ReceitasService receitasService){
-        this.receitasService = receitasService;
-    } 
+    @Autowired // ANOTAÇÃO QUE SERVE NO LUGAR DE CRIAR CONSTRUTOR 
+    private ReceitasService receitasService;
 
 
     //CLASSE PARA LISTAR AS RECEITAS (RETORNA SOMENTE OS CAMPOS DA CLASSE receitaDTO)
     @GetMapping
-    public List<ReceitasDTO> listarReceitas() {
-        return receitasService.listarReceitas();
+    public ResponseEntity<List<ReceitasDTO>> listarReceitas() {
+        List<ReceitasDTO> listaDtos = receitasService.listarReceitas();
+        return ResponseEntity.ok(listaDtos);
     }
 
 
@@ -52,8 +52,11 @@ public class ReceitasController {
     
     //CLASSE PARA CRIAR AS RECEITAS
     @PostMapping
-    public ReceitasDB criarReceita(@RequestBody ReceitasDB receita) {
-        return receitasService.salvarReceita(receita);
+    public ResponseEntity<ReceitasDTO> criarReceita(@RequestBody ReceitasDB receita) {
+        ReceitasDB receitasDB = receitasService.salvarReceita(receita);
+
+        ReceitasDTO receitasDTO = new ReceitasDTO(receitasDB);
+        return ResponseEntity.status(HttpStatus.CREATED).body(receitasDTO);
     }
     
     //CLASSE PARA DELETAR RECEITAS POR ID
@@ -63,15 +66,3 @@ public class ReceitasController {
         return ResponseEntity.noContent().build(); //USADO PORQUE O DELETARRECEITA FOI CRIADO COMO VOID 
     }
 }
-
-
-    /*
-    // ESSE METODO É PARA BUSCAR DIRETO DO RECEITASDB
-    //CLASSE PARA RETORNAR A RECEITA PELO ID
-    //SEMPRE COLOCAR O ? DENTRO DO <> QUANDO COLOCAR TRATAMENTO DE EXCEÇÃO - ResponseEntity<?>
-    @GetMapping("/{id}")
-    public ResponseEntity<?> buscarReceitaId(@PathVariable Long id) { 
-        //TRY E CATCH NÃO É MAIS NECESSARIO PORQUE CRIAMOS O ARQUIVO DE EXCEÇÕES GLOBAIS
-        ReceitasDB receitasDB = receitasService.buscarPorId(id);
-        return ResponseEntity.ok(receitasDB);
-    }*/
