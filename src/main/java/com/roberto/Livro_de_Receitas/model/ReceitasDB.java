@@ -17,6 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -53,6 +55,7 @@ public class ReceitasDB {
 
     @ManyToOne // DIZ QUE ESSA RECEITA PERTENCE A UM USUÁRIO
     @JoinColumn(name = "usuario_id") // CRIA A COLUNA 'USUARIO_ID' NA TABELA 'RECEITAS'
+    @JsonIgnore
     private UsuariosDB usuario;
 
     

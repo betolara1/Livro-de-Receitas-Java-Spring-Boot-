@@ -19,8 +19,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()) // MANTER O CERTIFICADO DESATIVADO PRO POSTMAN ENVIAR AS REQUISIÇÕES
-        .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/**").permitAll().anyRequest().authenticated())
-        .httpBasic(Customizer.withDefaults());
+            .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/v3/api-docs/**",
+                    "/v3/api-docs.yaml",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/swagger-resources/**",
+                    "/webjars/**").permitAll() // LIBERAR ACESSO AOS ARQUIVOS DO SWAGGER
+            .requestMatchers("/auth/**").permitAll().anyRequest().authenticated())
+            .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }

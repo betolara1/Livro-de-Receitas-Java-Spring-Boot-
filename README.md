@@ -12,6 +12,7 @@ Sistema de gerenciamento de receitas desenvolvido com Spring Boot, permitindo qu
 - **PostgreSQL** - Banco de dados relacional
 - **H2 Database** - Banco de dados em memória para desenvolvimento
 - **Thymeleaf** - Engine de templates para views
+- **SpringDoc OpenAPI (Swagger)** - Documentação interativa da API
 - **Lombok** - Redução de boilerplate
 - **Maven** - Gerenciamento de dependências
 
@@ -32,6 +33,11 @@ Sistema de gerenciamento de receitas desenvolvido com Spring Boot, permitindo qu
 - ✅ Atualizar receita existente (`PUT /api/receitas/{id}`)
 - ✅ Deletar receita (`DELETE /api/receitas/{id}`)
 - ✅ Usuários só podem visualizar, editar e deletar suas próprias receitas
+
+### Documentação da API
+- ✅ Documentação interativa com Swagger/OpenAPI
+- ✅ Interface Swagger UI para testar endpoints
+- ✅ Documentação automática de todos os endpoints da API
 
 ### Estrutura de Dados
 - **Usuários**: id, username (único), password (codificado com BCrypt)
@@ -92,7 +98,24 @@ Ou execute a classe `LivroDeReceitasApplication.java` diretamente na sua IDE.
 
 A aplicação estará disponível em: `http://localhost:8080`
 
-### 6. Interface Frontend
+### 6. Documentação da API (Swagger)
+
+O projeto inclui documentação interativa da API usando Swagger/OpenAPI. Após iniciar a aplicação, acesse:
+
+- **Swagger UI**: `http://localhost:8080/swagger-ui.html`
+- **API Docs (JSON)**: `http://localhost:8080/v3/api-docs`
+- **API Docs (YAML)**: `http://localhost:8080/v3/api-docs.yaml`
+
+A interface Swagger UI permite:
+- Visualizar todos os endpoints da API
+- Ver detalhes de cada endpoint (métodos, parâmetros, respostas)
+- Testar os endpoints diretamente na interface
+- Ver exemplos de requisições e respostas
+- Autenticar usando HTTP Basic Auth diretamente na interface
+
+**Nota**: As rotas do Swagger são públicas e não requerem autenticação.
+
+### 7. Interface Frontend
 
 O projeto inclui uma interface HTML completa localizada em `src/main/resources/static/index.html` que permite:
 
@@ -301,6 +324,7 @@ Authorization: Basic {credenciais_base64}
 - As rotas de receitas (`/api/receitas/**`) são protegidas e requerem autenticação HTTP Basic
 - A autenticação HTTP Basic deve ser enviada no header `Authorization: Basic {credenciais_base64}`
 - As rotas de autenticação (`/auth/**`) são públicas
+- As rotas do Swagger (`/swagger-ui/**`, `/v3/api-docs/**`) são públicas para facilitar o acesso à documentação
 - As senhas são codificadas usando BCrypt
 - **Isolamento de dados**: Cada usuário só pode visualizar, editar e deletar suas próprias receitas
   - O sistema verifica automaticamente a propriedade da receita antes de permitir operações de edição ou exclusão
@@ -362,6 +386,15 @@ spring.jpa.show-sql=true
 Se estiver usando H2, o console estará disponível em:
 `http://localhost:8080/h2-console`
 
+### Swagger/OpenAPI
+
+A documentação da API está disponível através do SpringDoc OpenAPI:
+- **Swagger UI**: `http://localhost:8080/swagger-ui.html`
+- **API Docs JSON**: `http://localhost:8080/v3/api-docs`
+- **API Docs YAML**: `http://localhost:8080/v3/api-docs.yaml`
+
+A documentação é gerada automaticamente a partir das anotações dos controladores e está sempre sincronizada com o código.
+
 ## 📝 Notas de Desenvolvimento
 
 - O projeto utiliza **DTOs** para transferência de dados, separando a camada de apresentação da camada de persistência
@@ -374,6 +407,7 @@ Se estiver usando H2, o console estará disponível em:
 - **Segurança de dados**: O sistema implementa controle de acesso baseado em propriedade, garantindo que usuários só possam modificar suas próprias receitas
 - Os modelos `CategoriasDB` e `FavoritosDB` estão criados, mas os endpoints ainda não foram implementados
 - A interface frontend utiliza JavaScript vanilla para comunicação com a API, mantendo o token Basic Auth durante a sessão
+- **Swagger/OpenAPI**: O projeto utiliza SpringDoc OpenAPI para documentação automática e interativa da API, permitindo testar endpoints diretamente na interface Swagger UI
 
 ## 🤝 Contribuindo
 
