@@ -2,332 +2,548 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Livro de Receitas - Cliente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranetech Receitas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f7f7fc;
-        }
-        h1 { color: #333 }
-        label { margin-top: 1em; font-weight: bold; }
-        input, textarea, button { margin: 0.3em 0; padding: 0.5em; }
-        .section { border: 1px solid #aaa; padding: 1em; margin-bottom: 2em; background: #fff; border-radius: 8px;}
-        .result { background:#eee; padding:8px; margin-top:10px; border-radius:6px; }
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            display: none;
-        }
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            display: none;
-        }
-        .ingredient-row, .instruction-row {
-            display: flex; align-items: center; gap: 7px; margin-top: 6px;
-        }
-        .ingredient-row input, .instruction-row input {
-            width: 180px; /* Ajuste se quiser um pouco mais largo */
-        }
-        .ingredient-row button, .instruction-row button {
-            width: 34px;
-            height: 34px;
-            font-size: 20px;
-            font-weight: bold;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .ingredient-row button:active, .instruction-row button:active {
-            background: #357a38;
+        /* --- CSS (A Maquiagem do Site) --- */
+        :root {
+            --primary-color: #ff6b6b; /* Cor principal (Laranja/Vermelho comida) */
+            --secondary-color: #4ecdc4;
+            --bg-color: #f7f9fc;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
         }
 
-        .ingredient-row, .instruction-row {
-            display: flex; align-items: center; gap: 7px; margin-top: 6px;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-        .ingredient-row input, .instruction-row input {
-            width: 180px;
+
+        /* Barra de Navegação */
+        nav {
+            background-color: var(--card-bg);
+            width: 100%;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
         }
-        .ingredient-row button, .instruction-row button {
-            width: 34px;
-            height: 34px;
-            font-size: 20px;
-            font-weight: bold;
-            background: #4CAF50;
+
+        .logo { font-weight: 600; font-size: 1.5rem; color: var(--primary-color); }
+        
+        .nav-buttons button {
+            margin-left: 10px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .btn-login { background-color: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); }
+        .btn-logout { background-color: #fab1a0; color: white; }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        
+        button:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        /* Container Principal */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin-top: 2rem;
+        }
+
+        /* Telas (Login, Cadastro, Lista) - Escondidas por padrão */
+        .screen { display: none; animation: fadeIn 0.5s; }
+        .active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Formulários */
+        .form-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            box-sizing: border-box; /* Garante que padding não estoure a largura */
+        }
+
+        /* Lista de Receitas (Cards) */
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .recipe-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .recipe-card h3 { margin-top: 0; color: var(--primary-color); }
+        .recipe-card small { color: #b2bec3; display: block; margin-bottom: 10px; }
+        
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff7675;
             color: white;
             border: none;
-            border-radius: 4px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
             cursor: pointer;
+            font-size: 12px;
         }
-        .ingredient-row button:active, .instruction-row button:active {
-            background: #357a38;
+
+        .edit-btn {
+            position: absolute;
+            top: 10px;
+            right: 40px;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
-    <h1>Livro de Receitas - Exemplo de Integração Frontend</h1>
-    
-    <div class="section">
-        <h2>Criar Nova Receita (POST)</h2>
-        <div id="success-post" class="success-message"></div>
-        <div id="error-post" class="error-message"></div>
-    
-        <label for="title-post">Título:</label>
-        <input type="text" id="title-post"><br>
-    
-        <label for="description-post">Descrição:</label>
-        <textarea id="description-post"></textarea><br>
-    
-        <label for="prepTime-post">Tempo de Preparo:</label>
-        <input type="text" id="prepTime-post"><br>
-    
-        <label for="difficulty-post">Dificuldade:</label>
-        <select id="difficulty-post">
-            <option value="facil">Fácil</option>
-            <option value="medio">Médio</option>
-            <option value="dificil">Difícil</option>
-        </select><br>
-    
-        <label for="temperature-post">Temperatura:</label>
-        <input type="text" id="temperature-post"><br>
-    
-        <!-- Ingredientes, dinâmicos -->
-        <label>Ingredientes:</label>
-        <div id="ingredients-list">
-            <div class="ingredient-row">
-                <input type="text" class="ingredient-quantity" placeholder="Quantidade"/>
-                <input type="text" class="ingredient-item" placeholder="Ingrediente"/>
-                <button type="button" onclick="addIngredientRow()">+</button>
+
+    <nav>
+        <div class="logo">Ranetech 🍳</div>
+        <div class="nav-buttons" id="nav-btns">
             </div>
-        </div><br>
-    
-        <!-- Instruções, dinâmicas -->
-        <label>Instruções:</label>
-        <div id="instructions-list">
-            <div class="instruction-row">
-                <input type="text" class="instruction-step" placeholder="Passo da receita"/>
-                <button type="button" onclick="addInstructionRow()">+</button>
+    </nav>
+
+    <div class="container">
+
+        <div id="screen-login" class="screen active">
+            <div class="form-card">
+                <h2 style="text-align: center;">Bem-vindo de volta!</h2>
+                <input type="text" id="login-user" placeholder="Usuário">
+                <input type="password" id="login-pass" placeholder="Senha">
+                <button class="btn-primary" style="width: 100%;" onclick="fazerLogin()">Entrar</button>
+                <p style="text-align: center; font-size: 0.9rem;">
+                    Não tem conta? <a href="#" onclick="showScreen('register')">Cadastre-se</a>
+                </p>
             </div>
-        </div><br>
-    
-        <button onclick="criarReceita()">Criar Receita</button>
-        <div id="result-post" class="result"></div>
-    </div>
-    
-    <div class="section">
-        <h2>Buscar Receita (GET)</h2>
-        <label for="id-get">ID da Receita:</label>
-        <input type="text" id="id-get" />
-        <button onclick="buscarReceita()">Buscar</button>
-        <div id="result-get" class="result"></div>
-    </div>
-    
-    <div class="section" id="edit-section">
-        <h2>Atualizar Receita (PUT)</h2>
-        <label for="id-edit">ID da Receita:</label>
-        <input type="text" id="id-edit" style="width:100px;">
-        <button type="button" onclick="buscarReceitaParaEditar()">Buscar</button><br><br>
-    
-        <div id="edit-form" style="display: none;">
-            <div id="success-edit" class="success-message"></div>
-            <div id="error-edit" class="error-message"></div>
-            
-            <label for="title-edit">Título:</label>
-            <input type="text" id="title-edit"><br>
-    
-            <label for="description-edit">Descrição:</label>
-            <textarea id="description-edit"></textarea><br>
-    
-            <label for="prepTime-edit">Tempo de Preparo:</label>
-            <input type="text" id="prepTime-edit"><br>
-    
-            <label for="difficulty-edit">Dificuldade:</label>
-            <select id="difficulty-edit">
-                <option value="facil">Fácil</option>
-                <option value="medio">Médio</option>
-                <option value="dificil">Difícil</option>
-            </select><br>
-    
-            <label for="temperature-edit">Temperatura:</label>
-            <input type="text" id="temperature-edit"><br>
-    
-            <label>Ingredientes:</label>
-            <div id="ingredients-edit-list"></div><br>
-    
-            <label>Instruções:</label>
-            <div id="instructions-edit-list"></div><br>
-    
-            <button onclick="atualizarReceita()">Atualizar</button>
         </div>
-        <div id="edit-notfound" class="error-message"></div>
-    </div>
-    
-    <div class="section">
-        <h2>Apagar Receita (DELETE)</h2>
-        <label for="id-del">ID da Receita:</label>
-        <input type="text" id="id-del" />
-        <button onclick="apagarReceita()">Apagar</button>
-        <div id="result-del" class="result"></div>
+
+        <div id="screen-register" class="screen">
+            <div class="form-card">
+                <h2 style="text-align: center;">Criar Conta</h2>
+                <input type="text" id="reg-user" placeholder="Escolha um usuário">
+                <input type="password" id="reg-pass" placeholder="Escolha uma senha">
+                <button class="btn-primary" style="width: 100%;" onclick="fazerCadastro()">Cadastrar</button>
+                <p style="text-align: center; font-size: 0.9rem;">
+                    Já tem conta? <a href="#" onclick="showScreen('login')">Fazer Login</a>
+                </p>
+            </div>
+        </div>
+
+        <div id="screen-dashboard" class="screen">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Minhas Receitas</h2>
+                <button class="btn-primary" onclick="showScreen('add-recipe')">+ Nova Receita</button>
+            </div>
+            
+            <div id="recipes-list" class="recipe-grid">
+                <p>Carregando...</p>
+            </div>
+        </div>
+
+        <div id="screen-add-recipe" class="screen">
+            <div class="form-card" style="max-width: 600px;">
+                <h2>Nova Receita</h2>
+                <input type="text" id="new-title" placeholder="Título (ex: Bolo de Cenoura)">
+                <textarea id="new-desc" placeholder="Descrição (ex: Fofinho com cobertura...)" rows="3"></textarea>
+                
+                <!-- Ingredientes (cada item com botão +) -->
+                <div style="margin-top: 10px;">
+                    <label><strong>Ingredientes</strong></label>
+                    <div style="display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap;">
+                        <input type="text" id="new-ingredient-item" placeholder="Ex: Farinha de trigo" style="flex: 2;">
+                        <input type="text" id="new-ingredient-qty" placeholder="Ex: 2 xícaras" style="flex: 1;">
+                        <button type="button" class="btn-primary" onclick="adicionarIngrediente()" style="white-space: nowrap;">+ Ingrediente</button>
+                    </div>
+                    <ul id="ingredients-list" style="margin-top: 8px; padding-left: 18px;"></ul>
+                </div>
+
+                <!-- Instruções (cada passo com botão +) -->
+                <div style="margin-top: 15px;">
+                    <label><strong>Instruções / Passos</strong></label>
+                    <div style="display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap;">
+                        <input type="text" id="new-instruction-text" placeholder="Ex: Misture os ingredientes secos" style="flex: 1;">
+                        <button type="button" class="btn-primary" onclick="adicionarInstrucao()" style="white-space: nowrap;">+ Passo</button>
+                    </div>
+                    <ol id="instructions-list" style="margin-top: 8px; padding-left: 18px;"></ol>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn-primary" style="flex: 1;" onclick="salvarReceita()">Salvar</button>
+                    <button style="flex: 1; background: #dfe6e9; border: none; border-radius: 20px; cursor: pointer;" onclick="showScreen('dashboard')">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // DICA: Troque a URL abaixo pela URL do seu backend Spring Boot
-        // Exemplo: const BASE_URL = "http://localhost:8080/api/receitas";
-        const BASE_URL = "http://localhost:8080/api/receitas";
+        /* --- JAVASCRIPT (O Cérebro) --- */
+        
+        const API_URL = "http://localhost:8080"; 
+        let tokenBasicGlobal = null; // guarda o usuário logado atual
 
-        // POST - Criar nova receita
-        // Função para adicionar um novo campo de ingrediente
-        function addIngredientRow() {
-            const list = document.getElementById('ingredients-list');
-            const row = document.createElement('div');
-            row.className = 'ingredient-row';
-            row.innerHTML = `
-                <input type="text" class="ingredient-quantity" placeholder="Quantidade"/>
-                <input type="text" class="ingredient-item" placeholder="Ingrediente"/>
-                <button type="button" onclick="removeRow(this)">-</button>
-            `;
-            list.appendChild(row);
+        // listas temporárias usadas na tela de criação
+        let ingredientesTemp = [];
+        let instrucoesTemp = [];
+        let receitaEditandoId = null; // guarda o ID da receita sendo editada (null = criando nova)
+
+        // 1. Gerenciador de Telas (Simples SPA)
+        function showScreen(screenName) {
+            // Esconde todas
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            // Mostra a escolhida
+            document.getElementById(`screen-${screenName}`).classList.add('active');
+            
+            // Atualiza botões do menu
+            updateNav(screenName);
+
+            // quando abrir tela de nova receita, limpa listas temporárias e UI
+            if (screenName === 'add-recipe') {
+                // Se não estiver editando, limpa tudo (modo criação)
+                if (receitaEditandoId === null) {
+                    ingredientesTemp = [];
+                    instrucoesTemp = [];
+                    renderIngredientes();
+                    renderInstrucoes();
+                    document.getElementById('new-title').value = '';
+                    document.getElementById('new-desc').value = '';
+                    document.getElementById('new-ingredient-item').value = '';
+                    document.getElementById('new-ingredient-qty').value = '';
+                    document.getElementById('new-instruction-text').value = '';
+                    document.querySelector('#screen-add-recipe h2').textContent = 'Nova Receita';
+                    document.querySelector('#screen-add-recipe button.btn-primary').textContent = 'Salvar';
+                }
+            }
         }
 
-        // Função para adicionar um novo campo de instrução
-        function addInstructionRow() {
-            const list = document.getElementById('instructions-list');
-            const row = document.createElement('div');
-            row.className = 'instruction-row';
-            row.innerHTML = `
-                <input type="text" class="instruction-step" placeholder="Passo da receita"/>
-                <button type="button" onclick="removeRow(this)">-</button>
-            `;
-            list.appendChild(row);
+        function updateNav(screenName) {
+            const nav = document.getElementById('nav-btns');
+            if (screenName === 'login' || screenName === 'register') {
+                nav.innerHTML = ''; // Limpa menu se não tiver logado
+            } else {
+                nav.innerHTML = `<button class="btn-logout" onclick="fazerLogout()">Sair</button>`;
+            }
         }
 
-        // Função para remover campos (ingrediente ou instrução)
-        function removeRow(btn) {
-            btn.parentElement.remove();
+        // 2. FUNÇÃO DE CADASTRO
+        async function fazerCadastro() {
+            const user = document.getElementById('reg-user').value;
+            const pass = document.getElementById('reg-pass').value;
+
+            // Chama seu Backend: /auth/register
+            const response = await fetch(`${API_URL}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+
+            if (response.ok) {
+                alert("Conta criada! Agora faça login.");
+                showScreen('login');
+            } else {
+                alert("Erro ao criar conta. Tente outro nome.");
+            }
         }
 
-        // Função para criar nova receita
-        function criarReceita() {
-            // Limpa avisos anteriores
-            document.getElementById('success-post').style.display = 'none';
-            document.getElementById('error-post').style.display = 'none';
+        // 3. FUNÇÃO DE LOGIN (A Mágica do Basic Auth)
+        async function fazerLogin() {
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
 
-            const title = document.getElementById('title-post').value;
-            const description = document.getElementById('description-post').value;
-            const prepTime = document.getElementById('prepTime-post').value;
-            const difficulty = document.getElementById('difficulty-post').value;
-            const temperature = document.getElementById('temperature-post').value;
+            // Transforma usuario:senha em Base64 (Padrão Basic Auth)
+            const tokenBasic = btoa(`${user}:${pass}`);
 
-            // Ingredientes (busca todos .ingredient-row)
-            const ingredientRows = document.querySelectorAll('#ingredients-list .ingredient-row');
-            const ingredients = [];
-            ingredientRows.forEach(row => {
-                const quantity = row.querySelector('.ingredient-quantity').value.trim();
-                const item = row.querySelector('.ingredient-item').value.trim();
-                if(item && quantity) { // só adiciona se os dois estiverem preenchidos
-                    ingredients.push({ item, quantity });
+            // Tenta buscar as receitas para testar a senha
+            const response = await fetch(`${API_URL}/api/receitas`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Basic ${tokenBasic}` // <--- Aqui enviamos a senha
                 }
             });
 
-            // Instruções (busca todos .instruction-row)
-            const instructionRows = document.querySelectorAll('#instructions-list .instruction-row');
-            const instructions = [];
-            instructionRows.forEach(row => {
-                const text = row.querySelector('.instruction-step').value.trim();
-                if(text) instructions.push(text);
-            });
+            if (response.status === 200) {
+                // guarda o token do usuário logado para usar nas demais chamadas
+                tokenBasicGlobal = tokenBasic;
+                showScreen('dashboard');
+                carregarReceitas();
+            } else {
+                alert("Usuário ou senha incorretos!");
+            }
+        }
 
-            const receita = {
-                title,
-                description,
-                prepTime,
-                difficulty,
-                temperature,
-                ingredients,
-                instructions
+        // Helpers para montar listas de ingredientes/instruções na tela de cadastro
+        function renderIngredientes() {
+            const ul = document.getElementById('ingredients-list');
+            ul.innerHTML = '';
+            ingredientesTemp.forEach((ing, idx) => {
+                const li = document.createElement('li');
+                li.textContent = ing.quantity ? `${ing.item} (${ing.quantity})` : ing.item;
+                li.style.cursor = 'pointer';
+                li.title = 'Clique para remover';
+                li.onclick = () => {
+                    ingredientesTemp.splice(idx, 1);
+                    renderIngredientes();
+                };
+                ul.appendChild(li);
+            });
+        }
+
+        function renderInstrucoes() {
+            const ol = document.getElementById('instructions-list');
+            ol.innerHTML = '';
+            instrucoesTemp.forEach((txt, idx) => {
+                const li = document.createElement('li');
+                li.textContent = txt;
+                li.style.cursor = 'pointer';
+                li.title = 'Clique para remover';
+                li.onclick = () => {
+                    instrucoesTemp.splice(idx, 1);
+                    renderInstrucoes();
+                };
+                ol.appendChild(li);
+            });
+        }
+
+        function adicionarIngrediente() {
+            const item = document.getElementById('new-ingredient-item').value.trim();
+            const qty = document.getElementById('new-ingredient-qty').value.trim();
+            if (!item) return;
+            ingredientesTemp.push({ item: item, quantity: qty });
+            document.getElementById('new-ingredient-item').value = '';
+            document.getElementById('new-ingredient-qty').value = '';
+            renderIngredientes();
+        }
+
+        function adicionarInstrucao() {
+            const txt = document.getElementById('new-instruction-text').value.trim();
+            if (!txt) return;
+            instrucoesTemp.push(txt);
+            document.getElementById('new-instruction-text').value = '';
+            renderInstrucoes();
+        }
+
+        // 4. CARREGAR RECEITAS (GET)
+        async function carregarReceitas() {
+            const container = document.getElementById('recipes-list');
+            container.innerHTML = '<p>Buscando receitas...</p>';
+
+            // Agora sempre mandamos o Basic do usuário logado
+            const response = await fetch(`${API_URL}/api/receitas`, {
+                method: 'GET',
+                headers: tokenBasicGlobal ? { 'Authorization': `Basic ${tokenBasicGlobal}` } : {}
+            });
+            
+            if (response.ok) {
+                const lista = await response.json();
+                container.innerHTML = ''; // Limpa
+
+                if (lista.length === 0) {
+                    container.innerHTML = '<p>Você ainda não tem receitas.</p>';
+                    return;
+                }
+
+                // Cria o HTML de cada receita
+                lista.forEach(receita => {
+                    // formata ingredientes e instruções de forma amigável
+                    const ingredientsText = Array.isArray(receita.ingredients)
+                        ? receita.ingredients.map(ing => {
+                            if (ing && typeof ing === 'object') {
+                                const nome = ing.item || ing.nome || '';
+                                const qtd = ing.quantity || ing.qtd || ing.quantidade || '';
+                                return qtd ? `${nome} (${qtd})` : nome;
+                            }
+                            return ing || '';
+                        }).filter(Boolean).join(', ')
+                        : (receita.ingredients || '...');
+
+                    const instructionsText = Array.isArray(receita.instructions)
+                        ? receita.instructions.filter(Boolean).join(' | ')
+                        : (receita.instructions || '...');
+
+                    const card = document.createElement('div');
+                    card.className = 'recipe-card';
+                    card.innerHTML = `
+                        <button class="delete-btn" onclick="deletarReceita(${receita.id})" title="Deletar">X</button>
+                        <button class="edit-btn" onclick="editarReceita(${receita.id})" title="Editar">✎</button>
+                        <h3>${receita.title}</h3>
+                        <small>Autor: ${receita.nomeDoAutor || 'Você'}</small>
+                        <p>${receita.description}</p>
+                        <hr style="border: 0; border-top: 1px solid #eee;">
+                        <details>
+                            <summary style="cursor: pointer; color: var(--secondary-color);">Ver Detalhes</summary>
+                            <p><strong>Ingredientes:</strong> ${ingredientsText}</p>
+                            <p><strong>Modo de Preparo:</strong> ${instructionsText}</p>
+                        </details>
+                    `;
+                    container.appendChild(card);
+                });
+            } else {
+                alert("Sessão expirada. Faça login novamente.");
+                showScreen('login');
+            }
+        }
+
+        // 5. FUNÇÃO PARA EDITAR RECEITA (Carrega dados na tela)
+        async function editarReceita(id) {
+            receitaEditandoId = id;
+            
+            try {
+                // Busca a receita pelo ID
+                const response = await fetch(`${API_URL}/api/receitas/${id}`, {
+                    method: 'GET',
+                    headers: tokenBasicGlobal ? { 'Authorization': `Basic ${tokenBasicGlobal}` } : {}
+                });
+
+                if (!response.ok) {
+                    alert("Erro ao carregar receita para edição.");
+                    return;
+                }
+
+                const receita = await response.json();
+                
+                // Preenche os campos
+                document.getElementById('new-title').value = receita.title || '';
+                document.getElementById('new-desc').value = receita.description || '';
+                
+                // Preenche ingredientes
+                ingredientesTemp = Array.isArray(receita.ingredients) ? receita.ingredients : [];
+                renderIngredientes();
+                
+                // Preenche instruções
+                instrucoesTemp = Array.isArray(receita.instructions) ? receita.instructions : [];
+                renderInstrucoes();
+                
+                // Muda o título da tela e o texto do botão
+                document.querySelector('#screen-add-recipe h2').textContent = 'Editar Receita';
+                document.querySelector('#screen-add-recipe button.btn-primary').textContent = 'Atualizar';
+                
+                // Mostra a tela de edição
+                showScreen('add-recipe');
+                
+            } catch (error) {
+                console.error('Erro ao carregar receita:', error);
+                alert("Erro ao carregar receita para edição.");
+            }
+        }
+
+        // 6. SALVAR/ATUALIZAR RECEITA (POST ou PUT)
+        async function salvarReceita() {
+            const title = document.getElementById('new-title').value;
+            const desc = document.getElementById('new-desc').value;
+            
+            if (!title.trim()) {
+                alert("Por favor, preencha o título da receita.");
+                return;
+            }
+            
+            // usa as listas montadas pelos botões "+"
+            const ingredients = ingredientesTemp;
+            const instructions = instrucoesTemp;
+
+            const receitaObj = {
+                title: title,
+                description: desc,
+                ingredients: ingredients,
+                instructions: instructions
             };
 
-            fetch(BASE_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(receita)
-            }).then(resp => {
-                if (resp.ok) return resp.json();
-                throw new Error('Erro ao criar receita.');
-            }).then(data => {
-                document.getElementById('result-post').innerText = "Receita criada: " + JSON.stringify(data, null, 2);
-                document.getElementById('success-post').innerText = "Receita salva com sucesso!";
-                document.getElementById('success-post').style.display = 'block';
-            }).catch(err => {
-                document.getElementById('result-post').innerText = '';
-                document.getElementById('error-post').innerText = err.message;
-                document.getElementById('error-post').style.display = 'block';
+            // Se estiver editando, faz PUT. Senão, faz POST
+            const isEditando = receitaEditandoId !== null;
+            const url = isEditando ? `${API_URL}/api/receitas/${receitaEditandoId}` : `${API_URL}/api/receitas`;
+            const method = isEditando ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: Object.assign(
+                    { 'Content-Type': 'application/json' },
+                    tokenBasicGlobal ? { 'Authorization': `Basic ${tokenBasicGlobal}` } : {}
+                ),
+                body: JSON.stringify(receitaObj)
             });
+
+            if (response.ok) {
+                alert(isEditando ? "Receita Atualizada!" : "Receita Salva!");
+                // Limpa tudo
+                receitaEditandoId = null;
+                ingredientesTemp = [];
+                instrucoesTemp = [];
+                document.getElementById('new-title').value = '';
+                document.getElementById('new-desc').value = '';
+                document.getElementById('new-ingredient-item').value = '';
+                document.getElementById('new-ingredient-qty').value = '';
+                document.getElementById('new-instruction-text').value = '';
+                showScreen('dashboard');
+                carregarReceitas(); // Atualiza a lista
+            } else {
+                const errorText = await response.text();
+                alert(`Erro ao ${isEditando ? 'atualizar' : 'salvar'}: ${errorText}`);
+            }
         }
 
-        // GET - Buscar uma receita pelo ID
-        function buscarReceita() {
-            const id = document.getElementById('id-get').value;
-            fetch(`${BASE_URL}/${id}`)
-                .then(resp => resp.ok ? resp.json() : Promise.reject(resp))
-                .then(data => {
-                    document.getElementById('result-get').innerText = JSON.stringify(data, null, 2);
-                })
-                .catch(error => {
-                    document.getElementById('result-get').innerText = "Erro ao buscar receita ou receita não encontrada.";
+        // 7. DELETAR (DELETE)
+        async function deletarReceita(id) {
+            if (confirm("Tem certeza que quer apagar?")) {
+                await fetch(`${API_URL}/api/receitas/${id}`, { 
+                    method: 'DELETE',
+                    headers: tokenBasicGlobal ? { 'Authorization': `Basic ${tokenBasicGlobal}` } : {}
                 });
+                carregarReceitas(); // Atualiza a tela
+            }
         }
 
-        // PUT - Atualizar uma receita existente
-        function atualizarReceita() {
-            const id = document.getElementById('id-put').value;
-            const nome = document.getElementById('nome-put').value;
-            const descricao = document.getElementById('descricao-put').value;
-            fetch(`${BASE_URL}/${id}`, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ nome: nome, descricao: descricao }) // Ajuste os campos conforme sua entidade
-            })
-            .then(resp => {
-                if (resp.ok) return resp.json();
-                throw new Error('Erro ao atualizar receita.');
-            })
-            .then(data => {
-                document.getElementById('result-put').innerText = "Receita atualizada: " + JSON.stringify(data, null, 2);
-            })
-            .catch(err => {
-                document.getElementById('result-put').innerText = err.message;
-            });
+        function fazerLogout() {
+            // "Esquece" o usuário logado atual no front
+            tokenBasicGlobal = null;
+            // Recarrega a página para limpar a memória do JS
+            window.location.reload();
         }
 
-        // DELETE - Apagar uma receita
-        function apagarReceita() {
-            const id = document.getElementById('id-del').value;
-            fetch(`${BASE_URL}/${id}`, { method: 'DELETE' })
-                .then(resp => {
-                    if (resp.ok) {
-                        document.getElementById('result-del').innerText = "Receita apagada com sucesso.";
-                    } else {
-                        throw new Error('Erro ao apagar receita.');
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('result-del').innerText = error.message;
-                });
-        }
     </script>
 </body>
 </html>

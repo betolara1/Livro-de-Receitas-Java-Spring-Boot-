@@ -26,10 +26,12 @@ Sistema de gerenciamento de receitas desenvolvido com Spring Boot, permitindo qu
 - ⏳ Autenticação JWT (dependências incluídas, implementação em desenvolvimento)
 
 ### Receitas
-- ✅ Listar todas as receitas (`GET /api/receitas`)
+- ✅ Listar todas as receitas do usuário logado (`GET /api/receitas`)
 - ✅ Buscar receita por ID (`GET /api/receitas/{id}`)
 - ✅ Criar nova receita (`POST /api/receitas`)
+- ✅ Atualizar receita existente (`PUT /api/receitas/{id}`)
 - ✅ Deletar receita (`DELETE /api/receitas/{id}`)
+- ✅ Usuários só podem visualizar, editar e deletar suas próprias receitas
 
 ### Estrutura de Dados
 - **Usuários**: id, username (único), password (codificado com BCrypt)
@@ -92,7 +94,20 @@ A aplicação estará disponível em: `http://localhost:8080`
 
 ### 6. Interface Frontend
 
-O projeto inclui uma interface HTML simples localizada em `src/main/resources/static/index.html` que permite testar as funcionalidades da API diretamente no navegador.
+O projeto inclui uma interface HTML completa localizada em `src/main/resources/static/index.html` que permite:
+
+- **Autenticação**: Registro e login de usuários
+- **Gerenciamento de Receitas**:
+  - Criar novas receitas com sistema de ingredientes e instruções dinâmicas
+  - Visualizar lista de receitas em cards
+  - Editar receitas existentes
+  - Deletar receitas
+- **Interface Moderna**: Design responsivo com CSS e JavaScript vanilla
+- **Funcionalidades**:
+  - Sistema de ingredientes com campos separados (nome e quantidade) e botão "+" para adicionar
+  - Sistema de instruções com botão "+" para adicionar cada passo
+  - Visualização detalhada de receitas com expand/collapse
+  - Autenticação HTTP Basic automática nas requisições
 
 ## 📡 Endpoints da API
 
@@ -222,6 +237,55 @@ Content-Type: application/json
 
 **Nota**: O DTO retornado não inclui `prepTime`, `difficulty` e `temperature` (filtrados propositalmente para demonstrar o uso de DTOs).
 
+#### Atualizar Receita
+```http
+PUT /api/receitas/{id}
+Authorization: Basic {credenciais_base64}
+Content-Type: application/json
+
+{
+  "title": "Bolo de Chocolate Atualizado",
+  "description": "Delicioso bolo de chocolate caseiro - versão melhorada",
+  "ingredients": [
+    {
+      "item": "Farinha de trigo",
+      "quantity": "2 xícaras"
+    },
+    {
+      "item": "Açúcar",
+      "quantity": "1 xícara"
+    }
+  ],
+  "instructions": [
+    "Misture os ingredientes secos",
+    "Adicione os ingredientes líquidos",
+    "Asse por 40 minutos"
+  ]
+}
+```
+
+**Resposta:**
+```json
+{
+  "id": 1,
+  "title": "Bolo de Chocolate Atualizado",
+  "description": "Delicioso bolo de chocolate caseiro - versão melhorada",
+  "ingredients": [
+    {
+      "item": "Farinha de trigo",
+      "quantity": "2 xícaras"
+    }
+  ],
+  "instructions": [
+    "Misture os ingredientes secos",
+    "Asse por 40 minutos"
+  ],
+  "usuario": "usuario123"
+}
+```
+
+**Nota**: Apenas o dono da receita pode atualizá-la. Tentativas de editar receitas de outros usuários retornarão erro.
+
 #### Deletar Receita
 ```http
 DELETE /api/receitas/{id}
@@ -230,12 +294,17 @@ Authorization: Basic {credenciais_base64}
 
 **Resposta:** `204 No Content`
 
+**Nota**: Apenas o dono da receita pode deletá-la. Tentativas de deletar receitas de outros usuários retornarão erro.
+
 ## 🔒 Segurança
 
 - As rotas de receitas (`/api/receitas/**`) são protegidas e requerem autenticação HTTP Basic
 - A autenticação HTTP Basic deve ser enviada no header `Authorization: Basic {credenciais_base64}`
 - As rotas de autenticação (`/auth/**`) são públicas
 - As senhas são codificadas usando BCrypt
+- **Isolamento de dados**: Cada usuário só pode visualizar, editar e deletar suas próprias receitas
+  - O sistema verifica automaticamente a propriedade da receita antes de permitir operações de edição ou exclusão
+  - Tentativas de acessar receitas de outros usuários retornam erro
 - **Nota**: As dependências JWT estão incluídas no projeto, mas a implementação completa ainda está em desenvolvimento
 
 ## 📁 Estrutura do Projeto
@@ -302,7 +371,9 @@ Se estiver usando H2, o console estará disponível em:
 - A autenticação atual utiliza **HTTP Basic Auth** com BCrypt para codificação de senhas
 - As dependências JWT estão incluídas no projeto, mas a implementação completa ainda está em desenvolvimento
 - As receitas possuem relacionamento ManyToOne com usuários, permitindo rastrear o criador de cada receita
+- **Segurança de dados**: O sistema implementa controle de acesso baseado em propriedade, garantindo que usuários só possam modificar suas próprias receitas
 - Os modelos `CategoriasDB` e `FavoritosDB` estão criados, mas os endpoints ainda não foram implementados
+- A interface frontend utiliza JavaScript vanilla para comunicação com a API, mantendo o token Basic Auth durante a sessão
 
 ## 🤝 Contribuindo
 

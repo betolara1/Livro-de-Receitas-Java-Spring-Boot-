@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -57,6 +58,14 @@ public class ReceitasController {
 
         ReceitasDTO receitasDTO = new ReceitasDTO(receitasDB);
         return ResponseEntity.status(HttpStatus.CREATED).body(receitasDTO);
+    }
+    
+    //CLASSE PARA ATUALIZAR RECEITA POR ID
+    @PutMapping("/{id}")
+    public ResponseEntity<ReceitasDTO> atualizarReceita(@PathVariable Long id, @RequestBody ReceitasDB receitaAtualizada) {
+        ReceitasDB receitaDB = receitasService.atualizarReceita(id, receitaAtualizada);
+        ReceitasDTO receitasDTO = new ReceitasDTO(receitaDB);
+        return ResponseEntity.ok(receitasDTO);
     }
     
     //CLASSE PARA DELETAR RECEITAS POR ID

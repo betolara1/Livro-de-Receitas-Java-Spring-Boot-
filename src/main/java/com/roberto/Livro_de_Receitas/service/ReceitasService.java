@@ -61,6 +61,32 @@ public class ReceitasService {
         return new ReceitasDTO(receitaDB);
     }
 
+    //CLASSE PARA ATUALIZAR UMA RECEITA
+    public ReceitasDB atualizarReceita(Long id, ReceitasDB receitaAtualizada) {
+        // 1. DESCOBRE QUEM ESTÁ TENTANDO EDITAR (QUEM É DONO DO TOKEN)
+        UsuariosDB usuarioLogado = getUsuarioLogado();
+
+        // 2. BUSCA A RECEITA NO BANCO. SE NÃO ACHAR, SOLTA ERRO 404.
+        ReceitasDB receitaExistente = receitasRepository.findById(id)
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Receita não encontrada com id: " + id));
+
+        // 3. VERIFICAÇÃO DE SEGURANÇA - Só pode editar suas próprias receitas
+        if (!receitaExistente.getUsuario().getId().equals(usuarioLogado.getId())) {
+            throw new RuntimeException("Operação não permitida: Você só pode editar suas próprias receitas!");
+        }
+
+        // 4. ATUALIZA OS CAMPOS (mantém o ID e o usuário)
+        receitaExistente.setTitle(receitaAtualizada.getTitle());
+        receitaExistente.setDescription(receitaAtualizada.getDescription());
+        receitaExistente.setIngredients(receitaAtualizada.getIngredients());
+        receitaExistente.setInstructions(receitaAtualizada.getInstructions());
+        // mantém o mesmo usuário (não muda o dono)
+        // receitaExistente.setUsuario(receitaExistente.getUsuario());
+
+        // 5. SALVA AS ALTERAÇÕES
+        return receitasRepository.save(receitaExistente);
+    }
+
     
     //CLASSE PARA DELETAR UMA RECEITA
     public void deletarReceita(Long id) {
